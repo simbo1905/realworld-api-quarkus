@@ -3,7 +3,7 @@
 #
 # Before building the docker image run:
 #
-# mvn package -Pnative -Dnative-image.docker-build=true
+# ./mvnw package -Dmaven.test.skip=true -Pnative -Dquarkus.native.container-build=true -Dquarkus.native.container-runtime=docker -Dquarkus.native.builder-image=quay.io/quarkus/ubi-quarkus-native-image:21.3-java17 -Dquarkus.native.additional-build-args='-H:-CheckToolchain'
 #
 # Then, build the image with:
 #
