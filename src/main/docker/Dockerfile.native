@@ -1,15 +1,11 @@
 ####
 # This Dockerfile is used in order to build a container that runs the Quarkus application in native (no JVM) mode
 #
-# Before building the docker image run the following to compile a linux native binary:
+# Before building the docker image run the following to compile a linux native binary on another host (MacOS or Windows):
 #
-# ./mvnw clean package -Dmaven.test.skip=true -Dquarkus.package.type=native-sources 
-# cp native-image.args target/native-sources/
-# cd target/native-sources
-# docker run -it --rm -v $(pwd):/work -w /work --entrypoint /bin/sh ghcr.io/graalvm/graalvm-ce:java17-21.3 -c "gu install native-image && native-image $(cat native-image.args) -J-Xmx5g"
-
-
-# Then, build the image with:
+#   ./build.sh
+# 
+# Then, build the natie image with:
 #
 # docker build -f src/main/docker/Dockerfile.native -t quarkus/realworldapiservice .
 #
@@ -18,10 +14,10 @@
 # docker run -i --rm -p 8080:8080 quarkus/realworldapiservice
 #
 ###
-# registry.access.redhat.com/ubi8/ubi-minimal -> 204 MB
-FROM registry.access.redhat.com/ubi8/ubi-minimal
-WORKDIR /work/
-COPY target/realworld-api-quarkus-runner /work/application
-RUN chmod 775 /work
+# The following creates a final docker image of 98 MB see https://github.com/GoogleContainerTools/distroless/issues/217#issuecomment-404551174
+FROM debian:stable-slim AS build-env
+FROM gcr.io/distroless/base
+COPY target/realworld-api-quarkus-runner /
+COPY --from=build-env //lib/aarch64-linux-gnu/libz.so.1 /lib/aarch64-linux-gnu/libz.so.1
 EXPOSE 8080
-CMD ["./application", "-Dquarkus.http.host=0.0.0.0"]
+CMD ["/realworld-api-quarkus-runner", "-Dquarkus.http.host=0.0.0.0"]
