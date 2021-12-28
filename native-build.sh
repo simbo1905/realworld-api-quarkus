@@ -4,4 +4,5 @@ set -x
 cp native-image.args target/native-sources/
 cd target/native-sources
 time docker run -it --rm -v $(pwd):/work -w /work --entrypoint /bin/sh ghcr.io/graalvm/native-image -c "native-image $(cat native-image.args) -J-Xmx5g"
+sleep 1
 mv target/native-sources/realworld-api-quarkus-runner target/

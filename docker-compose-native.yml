@@ -1,0 +1,23 @@
+version: "3.7"
+services:
+  realworld:
+    build:
+        context: .
+        dockerfile: src/main/docker/Dockerfile.native
+    environment:
+      - DB_URL=jdbc:postgresql://db:5432/postgres
+      - DB_USER=root
+      - DB_PASS=root
+    ports:
+      - 8080:8080
+      - 8081:8081
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13.2
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+    ports:
+      - 5432:5432

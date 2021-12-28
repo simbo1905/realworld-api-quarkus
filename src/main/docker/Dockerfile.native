@@ -5,7 +5,7 @@
 #
 #   ./native-build.sh
 # 
-# Then, build the natie image with:
+# Then, build the native image with:
 #
 # docker build -f src/main/docker/Dockerfile.native -t quarkus/realworldapiservice .
 #

@@ -44,10 +44,13 @@ infrastructure/         -> technical details layer
 ### Start local server
 
 ```bash
- ./mvnw compile quarkus:dev
+./mvnw compile quarkus:dev -Dquarkus.profile=h2
  ```
 
 The server should be running at http://localhost:8080
+
+Note the default profile it will expect postgres to be running. You need to use `-Dquarkus.profile=h2` to 
+start with an in-memory database. See how to run postgres in docker-compose below.  
 
 ### Running the application tests
 
@@ -57,36 +60,41 @@ The server should be running at http://localhost:8080
 
 ### Running postman collection tests
 
+First ensure that you are running the app with profile 'h2' then run the tests with:
+
 ```
 ./collections/run-api-tests.sh
 ```
 
-### Building jar file
+### Building and running jar with docker-compose
 
 ```
-./mvnw package
+./mvnw clean package -Dmaven.test.skip=true -Dquarkus.package.type=legacy-jar
+docker-compose up --build
 ```
 
-### Building native executable
-
-GraalVM is necessary for building native executable, more information about setting up GraalVM can be found
-in [Quarkus guides](https://quarkus.io/guides/)
-and database engine need to be changed.
+### Building and running native executable with docker-compose
 
 ```
-./mvnw package -Pnative
+# this runs docker to compile the app. you will need to allocate more CPU and 5G to docker
+# it might take 15 minutes to compile the 60MB app. 
+./native-build.sh
+docker-compose -f docker-compose-native.yml up --build
 ```
 
-#### Database changes can be made to the application.properties file.
+#### Database Changes
+
+The database properties within `application.propeties` use postgres and env vars `DB_URL`, `DB_USER` and `DB_PASS`:
 
 ```properties
-# Database configuration
-quarkus.datasource.db-kind=h2
-quarkus.datasource.jdbc.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-quarkus.datasource.jdbc.driver=org.h2.Driver
-quarkus.datasource.username=sa
-quarkus.datasource.password=
+quarkus.datasource.db-kind=postgresql
+quarkus.datasource.jdbc.driver=org.postgresql.Driver
+quarkus.datasource.jdbc.url=${DB_URL:jdbc:postgresql://localhost:5432/postgres}
+quarkus.datasource.username=${DB_USER:postgres}
+quarkus.datasource.password=${DB_PASS:123456}
 ```
+
+See `docker-compose.yml` as a fully working example. 
 
 ## Help
 
