@@ -79,7 +79,7 @@ docker-compose up --build
 # this runs docker to compile the app. you will need to allocate more CPU and 5G to docker
 # it might take 15 minutes to compile the 60MB app. 
 ./native-build.sh
-docker-compose -f docker-compose-native.yml up --build
+ldlocker-compose -f docker-compose-native.yml up --build
 ```
 
 #### Database Changes
